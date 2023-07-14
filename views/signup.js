@@ -23,9 +23,12 @@ async function submitHandler(e) {
         }
         console.log(data);
         const res = await axios.post("http://localhost:3000/users/add-user", data);
-        console.log(res.data.resData);
-        if (res.data.resData !== "success") {
-            alert("User already registered")
+        // console.log(res.data.resData);
+        if (res.data.resData === "duplicate") {
+            alert("User already registered");
+        }
+        else{
+            alert("Successfully signed up");
         }
         // window.location.href = 'login.html';
     }
