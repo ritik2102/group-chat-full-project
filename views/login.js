@@ -30,9 +30,22 @@ async function login(e) {
             "email": email,
             "password": password
         }
-        console.log(credentials);
-        axios.post('http://localhost:3000/users/user-login', credentials);
-        
+        await axios.post('http://localhost:3000/users/user-login', credentials)
+            .then(response => {
+                localStorage.setItem('token', response.data.token);
+                alert("Successfully logged in");
+            })
+            .catch(err => {
+                console.log(err.response.status);
+                if(err.response.status===404){
+                    loginMessage.style.visibility = 'visible';
+                }
+                else if(err.response.status===401){
+                    passwordMessage.style.visibility='visible';
+                }
+            })
+        emailField.value = "";
+        passwordField.value = "";
     }
     catch (err) {
         if (err.response.status === 401) {
