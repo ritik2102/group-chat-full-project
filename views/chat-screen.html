@@ -8,14 +8,14 @@
 </head>
 <body>
     <div class="message-container">
-        <!-- <h1>Message container</h1> -->
     </div>
     <div class="writing-container">
-        <!-- <h2>Writing container</h2> -->
-        <form id="message-form" action="" method="post">
-            <input id="typing-box" type="text">
+        <form id="message-form" method="POST" onsubmit="submitHandler(event)">
+            <input id="input-box" type="text" required>
             <button id="message-button" type="submit">Send</button>
         </form>
     </div>
 </body>
+<script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+<script src="chat-screen.js"></script>
 </html>

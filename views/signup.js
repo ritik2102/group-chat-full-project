@@ -30,7 +30,7 @@ async function submitHandler(e) {
         else{
             alert("Successfully signed up");
         }
-        // window.location.href = 'login.html';
+        window.location.href = 'login.html';
     }
     catch (err) {
         console.log(err);

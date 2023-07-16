@@ -16,12 +16,13 @@ body{
     margin: auto;
     text-align:center;
 }
-#typing-box{
+#input-box{
     position:relative;
     margin:3.8vh auto;
     width: 30%;
-    height:22px;
+    height:2.2vh;
 }
 #message-button{
-    height:28px;
+    height:2.7vh;
+    font-size: 1.5vh;
 }
