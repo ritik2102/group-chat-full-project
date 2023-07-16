@@ -69,3 +69,8 @@ exports.userLogin=(req,res,next)=>{
         throw new Error(err);
     }
 }
+
+exports.getUser=(req,res,next)=>{
+    // console.log(req.user.name);
+    res.status(201).json({"name":req.user.name});
+}

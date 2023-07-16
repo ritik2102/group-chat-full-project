@@ -8,6 +8,7 @@ const Message = sequelize.define('Message', {
     autoIncrement: true,
   },
   userId:Sequelize.INTEGER,
+  userName:Sequelize.STRING,
   content: {
     type: Sequelize.TEXT,
     allowNull: false,

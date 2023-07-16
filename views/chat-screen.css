@@ -1,28 +1,71 @@
-body{
+body {
     display: grid;
-    grid-template-rows: 9fr 1fr;
-}
-.message-container{
-    background-color:whitesmoke;
-    height:90vh;
-}
-.writing-container{
-    background-color:#804674;
-    height:10vh;
+    grid-template-rows: auto auto;
 }
 
-#message-form{
+.message-container {
+    background-color: whitesmoke;
+    height: 90vh;
+}
+
+.writing-container {
+    background-color: #804674;
+    height: 10vh;
+}
+
+#welcome-message {
+    text-align: center;
+}
+
+#messages {
+    list-style: none;     
+    padding: 0;
+    margin: 0;
+}
+
+#message-form {
     position: relative;
     margin: auto;
-    text-align:center;
+    text-align: center;
 }
-#input-box{
-    position:relative;
-    margin:3.8vh auto;
+
+#input-box {
+    position: relative;
+    margin: 3.8vh auto;
     width: 30%;
-    height:2.2vh;
+    height: 2.2vh;
 }
-#message-button{
-    height:2.7vh;
+
+#message-button {
+    height: 2.7vh;
     font-size: 1.5vh;
+}
+
+
+li {
+    background-color:#D6E4E5;
+    display: inline;
+    margin-bottom: 10px; 
+    border-radius:5px;
+    line-height: 3.5;
+    padding: 5px;
+    height:15px;
+}
+/* p{
+    background-color:#D6E4E5;
+    display: inline;
+    margin-bottom: 10px; 
+    border-radius:5px;
+    line-height: 3.5;
+    padding: 5px;
+    height:15px;
+} */
+
+.current-user{
+    background-color:#B2B2B2;
+    /* float: right; */
+}
+/* 917FB3 */
+.other-user{
+    background-color:#B2B2B2;
 }
