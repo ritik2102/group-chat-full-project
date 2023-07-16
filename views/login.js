@@ -33,7 +33,8 @@ async function login(e) {
         await axios.post('http://localhost:3000/users/user-login', credentials)
             .then(response => {
                 localStorage.setItem('token', response.data.token);
-                alert("Successfully logged in");
+                window.location.href='chat-screen.html';
+
             })
             .catch(err => {
                 console.log(err.response.status);

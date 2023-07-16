@@ -1,0 +1,27 @@
+body{
+    display: grid;
+    grid-template-rows: 9fr 1fr;
+}
+.message-container{
+    background-color:whitesmoke;
+    height:90vh;
+}
+.writing-container{
+    background-color:#804674;
+    height:10vh;
+}
+
+#message-form{
+    position: relative;
+    margin: auto;
+    text-align:center;
+}
+#typing-box{
+    position:relative;
+    margin:3.8vh auto;
+    width: 30%;
+    height:22px;
+}
+#message-button{
+    height:28px;
+}
