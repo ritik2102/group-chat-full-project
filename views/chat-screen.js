@@ -6,6 +6,7 @@ const messageList=document.getElementById('messages');
 let userName;
 async function init(){
     try{
+        messageList.innerHTML='';
         await axios.get('http://localhost:3000/users/getUser', { headers: { "Authorization": token } }).
             then(response=>{
                 // console.log(response.data.name);
@@ -44,6 +45,7 @@ async function init(){
 
 init();
 
+setInterval(()=>init(),1000);
 
 async function submitHandler(e) {
 
