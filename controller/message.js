@@ -1,4 +1,5 @@
 const Message=require('../model/message');
+const Sequelize=require("sequelize");
 
 exports.postMessage=(req,res,next)=>{
     console.log('controller');
@@ -19,7 +20,11 @@ exports.postMessage=(req,res,next)=>{
 
 exports.getMessage=(req,res,next)=>{
     // console.log(req.user);
-    Message.findAll()
+    const lastMessageId=+req.query.lastMessageId;
+    Message.findAll(
+        {where:
+             {messageID: {[Sequelize.Op.gt]: lastMessageId}}
+        })
         .then(messages=>{
             res.status(201).json({"response":messages});
         })

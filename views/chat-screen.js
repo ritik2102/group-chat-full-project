@@ -4,25 +4,49 @@ const token=localStorage.getItem('token');
 const welcomeMessage=document.getElementById('welcome-message');
 const messageList=document.getElementById('messages');
 let userName;
+
+let lastMessageId;
+// localStorage.removeItem("oldMessages");
+const oldMessages=JSON.parse(localStorage.getItem("oldMessages"));
+if(!oldMessages){
+    // console.log("Here");
+    lastMessageId=0;
+} else{
+    // console.log("Here 1");
+    const length=oldMessages.length;
+    lastMessageId=oldMessages[length-1].messageID
+    // // lastMessageId=oldMessages.length;
+    // console.log(lastMessageId);
+    // console.log(oldMessages);
+}
+
 async function init(){
     try{
         messageList.innerHTML='';
         await axios.get('http://localhost:3000/users/getUser', { headers: { "Authorization": token } }).
             then(response=>{
-                // console.log(response.data.name);
                 userName=response.data.name;
                 welcomeMessage.innerHTML=`Welcome ${userName}!!!`;
             })
             .catch(err=>{
                 throw new Error(err);
             })
-        await axios.get('http://localhost:3000/message/get-message',{ headers: { "Authorization": token } })
+            await axios.get(`http://localhost:3000/message/get-message?lastMessageId=${lastMessageId}`,{ headers: { "Authorization": token } })
             .then(response=>{
-                const messages=response.data.response;
+                if(lastMessageId===0){
+                    const data=response.data.response;
+                    const lastElements=data.slice(-10);
+                    localStorage.setItem("oldMessages",JSON.stringify(lastElements));
+                }
+                else{
+                    const newArray=oldMessages.concat(response.data.response);
+                    const lastElements=newArray.slice(-10);
+                    localStorage.setItem("oldMessages",JSON.stringify(lastElements));
+                }
+                const messages=JSON.parse(localStorage.getItem("oldMessages"));
+
                 messages.forEach(element => {
-                    console.log(element);
                     const li=document.createElement('li');
-                    // const li=document.createElement('p');
                     if(element.userName===userName){
                         li.classList.add('current-user');
                         li.innerHTML=`You-${element.content}`;
@@ -45,7 +69,7 @@ async function init(){
 
 init();
 
-setInterval(()=>init(),1000);
+// setInterval(()=>init(),1000);
 
 async function submitHandler(e) {
 

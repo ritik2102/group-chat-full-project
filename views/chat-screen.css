@@ -65,26 +65,14 @@ li {
     padding: 5px;
     height:15px;
 }
-/* p{
-    background-color:#D6E4E5;
-    display: inline;
-    margin-bottom: 10px; 
-    border-radius:5px;
-    line-height: 3.5;
-    padding: 5px;
-    height:15px;
-} */
 
-/* 2A2F4F */
+
+
 .current-user{
     background-color:#917FB3;
-    /* background-color:#3F2E3E; */
-    /* float: right; */
 }
-/* 917FB3 */
+
 .other-user{
     background-color:#435B66;
     color:azure;
 }
-/* B2B2B2 */
-/* 3F2E3E */
