@@ -71,6 +71,20 @@ exports.userLogin=(req,res,next)=>{
 }
 
 exports.getUser=(req,res,next)=>{
-    // console.log(req.user.name);
     res.status(201).json({"name":req.user.name});
+}
+
+exports.getUsers=async(req,res,next)=>{
+    try{
+        await User.findAll()
+            .then(users=>{
+                res.status(201).json({"users":users});
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+    } catch(err){
+        console.log(err);
+    }
+    
 }
