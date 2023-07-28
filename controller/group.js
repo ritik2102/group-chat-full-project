@@ -13,7 +13,7 @@ exports.addGroup = async (req, res, next) => {
             .then(response => {
                 const groupId = response.dataValues.id;
 
-                UserGroup.create({ userId: userId, groupId: groupId }, { transaction: t })
+                UserGroup.create({ userId: userId, groupId: groupId ,isAdmin:true }, { transaction: t })
                     .then(async () => {
                         await t.commit();
                         res.status(201).json({ "success": true });
@@ -64,7 +64,7 @@ exports.addMember=async(req,res,next)=>{
         const groupId=req.body.group;
         console.log(userId,groupId);
 
-        UserGroup.create({userId:userId ,groupId:groupId })
+        UserGroup.create({userId:userId ,groupId:groupId ,isAdmin:false})
             .then(response=>{
                 res.status(201).json({"success":true});
             })
@@ -72,7 +72,87 @@ exports.addMember=async(req,res,next)=>{
                 console.log(err);
             })
            
-    } catch{
+    } catch (err){
+        throw new Error(err);
+    }
+}
 
+exports.removeMember=async(req,res,next)=>{
+    try{
+        const userId=req.body.userId;
+        const groupId=req.body.groupId;
+        // console.log(userId,groupId);
+        UserGroup.findAll({where:{userId:userId,groupId:groupId}})
+            .then(usergroup=>{
+                usergroup[0].destroy();
+                res.status(201).json({"success":true});
+            })
+            .catch(err=>{
+                throw new Error(err);
+            })
+    } catch(err){
+        throw new Error(err);
+    }
+}
+
+exports.isAdmin=(req,res,next)=>{
+    try{
+        const userId=req.user.id;
+        const groupId=req.header("groupId");
+        
+        UserGroup.findAll({where:{groupId:groupId,userId:userId}})
+            .then(response=>{
+                // console.log(response[0].dataValues);
+                const dataValues=response[0].dataValues;
+                if(dataValues.isAdmin){
+                    res.status(201).json({"isAdmin":true});
+                } else{
+                    res.status(201).json({"isAdmin":false});
+                }   
+            })
+            .catch(err=>{
+                throw new Error(err);
+            })
+    } catch(err){
+        throw new Error(err);
+    }
+}
+
+exports.getUsers=(req,res,next)=>{
+    try{
+        // console.log(req.user.id);
+        const groupId=req.header("groupId");
+        const userId=req.user.id;
+        UserGroup.findAll({where:{groupId:groupId}})
+            .then(response=>{
+                const users=[];
+                for(let i=0;i<response.length;i++){
+                    users.push(response[i].dataValues);
+                }
+                res.status(201).json({"users":users});
+            })
+            .catch(err=>{
+                throw new Error(err);
+            })
+    } catch(err){
+        throw new Error(err);
+    }
+}
+
+exports.makeAdmin=async(req,res,next)=>{
+    try{
+        const userId=req.body.userId;
+        const groupId=req.body.groupId;
+        console.log(userId,groupId);
+        UserGroup.findAll({where:{userId:userId,groupId:groupId}})
+            .then(usergroup=>{
+                usergroup[0].isAdmin=true;
+                usergroup[0].save();
+            })
+            .catch(err=>{
+                throw new Error(err);
+            })
+    } catch(err){
+        throw new Error(err);
     }
 }

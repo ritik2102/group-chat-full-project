@@ -12,7 +12,6 @@ const authenticate=(req,res,next)=>{
             then(user=>{
                 req.user=user;
                 // console.log(req.user);
-                // console.log("At authenticator");
                 next();
             })
             .catch(err=>{

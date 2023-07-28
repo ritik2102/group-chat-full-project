@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="chat-screen.css">
 </head>
+
 <body>
     <div id="left">
         <div class="container">
             <button class="show-modal" id="create-group" class="centered-button">Create new group</button>
-          </div>
+        </div>
         <h1 id="group-heading">Groups</h1>
         <ul id="groups-container">
             <!-- <li class="group-list-item">First group</li><hr>
@@ -20,10 +22,13 @@
     </div>
     <div id="right">
         <div class="message-container">
+            <div id="navbar-right">
+                <a id="logout-button" class="myButton" href="login.html">Logout</a>
+            </div>
             <div id="navbar">
-               <button class="show-modal-add" id="add-participant">Add Participant</button>
-               <h1 id="welcome-message"></h1>
-               <a id="logout-button" class="myButton" href="login.html">Logout</a>
+                <button class="show-modal-add" id="add-participant">Add Participant</button>
+                <h1 id="welcome-message"></h1>
+                <button class="show-modal-members" id="group-members" class="centered-button">Group Members</button>
             </div>
             <ul id="messages"></ul>
             <!-- <div id="messages"></div> -->
@@ -43,12 +48,12 @@
             <input type="text" id="group-name">
             <button id="group-submit" onclick="addGroup(event)">Submit</button>
         </Form>
-      </div>
-      <div class="overlay hidden"></div>
+    </div>
+    <div class="overlay hidden"></div>
 
 
-      <!-- Modal window for adding participants -->
-      <div class="modal-add hidden">
+    <!-- Modal window for adding participants -->
+    <div class="modal-add hidden">
         <button class="close-modal-add">&times;</button>
         <h1>Add participants 😍</h1>
         <Form>
@@ -56,9 +61,17 @@
             </select>
             <button id="participant-submit" onclick="addParticipant(event)">Submit</button>
         </Form>
-      </div>
-      <div class="overlay-add hidden"></div>
+    </div>
+    <div class="overlay-add hidden"></div>
+
+    <div class="modal-members hidden">
+        <button class="close-modal-members">&times;</button>
+        <h1>Group members 😍</h1>
+        <ul id="group-users"></ul>
+    </div>
+    <div class="overlay-members hidden"></div>
 </body>
 <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 <script src="chat-screen.js"></script>
+
 </html>

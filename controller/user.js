@@ -88,3 +88,19 @@ exports.getUsers=async(req,res,next)=>{
     }
     
 }
+
+exports.getSingleUser=async(req,res,next)=>{
+    try{
+        const userId=req.params.id;
+        User.findAll({where:{id:userId}})
+            .then(user=>{
+                const userInfo=user[0].dataValues;
+                res.status(201).json({"userInfo":userInfo});
+            })
+            .catch(err=>{
+                throw new Error(err);
+            })
+    } catch(err){
+        throw new Error(err);
+    }
+}

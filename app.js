@@ -40,7 +40,7 @@ Message.belongsTo(Group);
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
-// {force:true}
+// sequelize.sync({force:true})
 sequelize.sync()
     .then(result=>{
         app.listen(3000);

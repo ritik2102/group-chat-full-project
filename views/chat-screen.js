@@ -46,8 +46,6 @@ document.addEventListener('keydown', function (e) {
 
 
 
-
-
 // Modal window for adding participants
 
 
@@ -106,6 +104,139 @@ document.addEventListener('keydown', function (e) {
 });
 
 
+// Modal window for group members
+
+const membersModal = document.querySelector('.modal-members');
+const overlayMembers = document.querySelector('.overlay-members');
+const btnCloseModalMembers = document.querySelector('.close-modal-members');
+const btnsOpenModalMembers = document.querySelector('.show-modal-members');
+
+const openModalMembers = function () {
+    membersModal.classList.remove('hidden');
+    overlayMembers.classList.remove('hidden');
+};
+
+const closeModalMembers = function () {
+    membersModal.classList.add('hidden');
+    overlayMembers.classList.add('hidden');
+};
+
+
+btnsOpenModalMembers.addEventListener('click', openModalMembers);
+btnsOpenModalMembers.addEventListener('click', async () => {
+    try {
+        if (!selectedGroup) {
+            alert("Please select a group first");
+        } else {
+            axios.get("http://localhost:3000/group/isAdmin", { headers: { "Authorization": token, "groupId": selectedGroup } })
+                .then(response => {
+                    const isAdmin = response.data.isAdmin;
+
+                    // Logging users
+                    const groupUsers = document.getElementById("group-users");
+                    groupUsers.innerHTML = "";
+                    axios.get("http://localhost:3000/group/getUsers", { headers: { "Authorization": token, "groupId": selectedGroup } })
+                        .then(response => {
+                            const users = response.data.users;
+                            for (let i = 0; i < users.length; i++) {
+                                const user = users[i].userId;
+                                axios.get(`http://localhost:3000/users/getSingleUser/${user}`)
+                                    .then(response => {
+                                        const userInfo = response.data.userInfo;
+
+                                        // Creating list item
+                                        const li = document.createElement("li");
+                                        li.classList.add("group-members-list-item");
+                                        li.appendChild(document.createTextNode(`${userInfo.name}`));
+
+                                        // Remove user button
+                                        const removeButton = document.createElement("button");
+                                        removeButton.classList.add("remove-user-button");
+                                        removeButton.appendChild(document.createTextNode("Remove User"))
+
+                                        removeButton.onclick = async () => {
+                                            if(!isAdmin){
+                                                alert("Only admin can make changes");
+                                            } else{
+                                                const userId=user;
+                                                const groupId=selectedGroup;
+                                                const data={
+                                                    userId:userId,
+                                                    groupId:groupId
+                                                }
+                                                axios.post("http://localhost:3000/group/removeMember",data)
+                                                    .then(response=>{
+                                                        groupUsers.removeChild(li);
+                                                    })
+                                                    .catch(err=>{
+                                                        throw new Error(err);
+                                                    })
+                                                
+                                            }
+                                        }
+
+                                        li.appendChild(removeButton);
+
+                                        // Make admin button
+                                        const adminButton = document.createElement("button");
+                                        adminButton.classList.add("make-admin-button");
+                                        adminButton.appendChild(document.createTextNode("Make admin"))
+
+                                        adminButton.onclick = async () => {
+                                            if(!isAdmin){
+                                                alert("Only admin can make changes");
+                                            } else{
+                                                const userId=user;
+                                                const groupId=selectedGroup;
+                                                const data={
+                                                    userId:userId,
+                                                    groupId:groupId
+                                                }
+                                                axios.post("http://localhost:3000/group/makeAdmin",data)
+                                                    .then(response=>{
+                                                        alert(`${userInfo.name} is now an admin`);
+                                                    })
+                                                    .catch(err=>{
+                                                        throw new Error(err);
+                                                    })
+                                            }
+                                        }
+
+                                        li.appendChild(adminButton);
+
+                                        // Adding li to the unordered list
+                                        groupUsers.appendChild(li);
+
+                                    })
+                                    .catch(err => {
+                                        throw new Error(err);
+                                    })
+                            }
+                        })
+                        .catch(err => {
+                            throw new Error(err);
+                        })
+                })
+                .catch(err => {
+                    throw new Error(err);
+                })
+
+        }
+    } catch (err) {
+        throw new Error(err);
+    }
+});
+
+btnCloseModalMembers.addEventListener('click', closeModalMembers);
+overlayMembers.addEventListener('click', closeModalMembers);
+
+document.addEventListener('keydown', function (e) {
+
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModalMembers();
+    }
+});
+
 
 
 
@@ -119,22 +250,36 @@ async function addParticipant(e) {
         if (!selectedGroup) {
             alert("Select a group first");
         } else {
-            console.log(selectedGroup);
-            for (let i = 0; i < users.length; i++) {
-                console.log(users[i].value);
-                const data={
-                    user:users[i].value,
-                    group:selectedGroup
-                }
-                axios.post("http://localhost:3000/group/addMember",data)
-                    .then(res=>{
-
-                    })
-                    .catch(err=>{
-                        console.log(err);
-                    })
-            }
+            axios.get("http://localhost:3000/group/isAdmin", { headers: { "Authorization": token, "groupId": selectedGroup } })
+                .then(response => {
+                    const isAdmin = response.data.isAdmin;
+                    if (!isAdmin) {
+                        alert("Only admins can modify groups");
+                    }
+                    else {
+                        // console.log(selectedGroup);
+                        for (let i = 0; i < users.length; i++) {
+                            console.log(users[i].value);
+                            const data = {
+                                user: users[i].value,
+                                group: selectedGroup
+                            }
+                            axios.post("http://localhost:3000/group/addMember", data)
+                                .then(res => {
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                })
+                        }
+                    }
+                })
+                .catch(err => {
+                    throw new Error(err);
+                })
         }
+
+
+        //
 
 
     } catch (err) {

@@ -8,7 +8,8 @@ const UserGroup = sequelize.define('usergroup', {
     autoIncrement: true,
   },
   userId:Sequelize.INTEGER,
-  groupId:Sequelize.INTEGER
+  groupId:Sequelize.INTEGER,
+  isAdmin:Sequelize.BOOLEAN
 });
 
 module.exports = UserGroup;
