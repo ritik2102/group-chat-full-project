@@ -13,6 +13,11 @@ let selectedGroup;
 
 
 
+
+
+
+
+
 //Modal window functionality for adding group
 // 'use strict';
 
@@ -43,6 +48,19 @@ document.addEventListener('keydown', function (e) {
         closeModal();
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -104,6 +122,17 @@ document.addEventListener('keydown', function (e) {
 });
 
 
+
+
+
+
+
+
+
+
+
+
+
 // Modal window for group members
 
 const membersModal = document.querySelector('.modal-members');
@@ -155,23 +184,23 @@ btnsOpenModalMembers.addEventListener('click', async () => {
                                         removeButton.appendChild(document.createTextNode("Remove User"))
 
                                         removeButton.onclick = async () => {
-                                            if(!isAdmin){
+                                            if (!isAdmin) {
                                                 alert("Only admin can make changes");
-                                            } else{
-                                                const userId=user;
-                                                const groupId=selectedGroup;
-                                                const data={
-                                                    userId:userId,
-                                                    groupId:groupId
+                                            } else {
+                                                const userId = user;
+                                                const groupId = selectedGroup;
+                                                const data = {
+                                                    userId: userId,
+                                                    groupId: groupId
                                                 }
-                                                axios.post("http://localhost:3000/group/removeMember",data)
-                                                    .then(response=>{
+                                                axios.post("http://localhost:3000/group/removeMember", data)
+                                                    .then(response => {
                                                         groupUsers.removeChild(li);
                                                     })
-                                                    .catch(err=>{
+                                                    .catch(err => {
                                                         throw new Error(err);
                                                     })
-                                                
+
                                             }
                                         }
 
@@ -183,20 +212,20 @@ btnsOpenModalMembers.addEventListener('click', async () => {
                                         adminButton.appendChild(document.createTextNode("Make admin"))
 
                                         adminButton.onclick = async () => {
-                                            if(!isAdmin){
+                                            if (!isAdmin) {
                                                 alert("Only admin can make changes");
-                                            } else{
-                                                const userId=user;
-                                                const groupId=selectedGroup;
-                                                const data={
-                                                    userId:userId,
-                                                    groupId:groupId
+                                            } else {
+                                                const userId = user;
+                                                const groupId = selectedGroup;
+                                                const data = {
+                                                    userId: userId,
+                                                    groupId: groupId
                                                 }
-                                                axios.post("http://localhost:3000/group/makeAdmin",data)
-                                                    .then(response=>{
+                                                axios.post("http://localhost:3000/group/makeAdmin", data)
+                                                    .then(response => {
                                                         alert(`${userInfo.name} is now an admin`);
                                                     })
-                                                    .catch(err=>{
+                                                    .catch(err => {
                                                         throw new Error(err);
                                                     })
                                             }
@@ -240,8 +269,40 @@ document.addEventListener('keydown', function (e) {
 
 
 
-// Application functionality
 
+
+
+// Application functionality
+const socket = io.connect('http://localhost:3000')
+
+
+// Handler for when a user joins a group
+// socket.emit("joinGroup",selectedGroup);
+
+// Handler for sending message in a group
+// socket.emit('sendMessageToGroup', { groupName, message: messageToSend });
+
+// k at any point is the starting point for the messages
+let k = 0;
+// Receiving messages in the group
+socket.on('message', (messageInfo) => {
+
+    // console.log(messageInfo.userName, messageInfo.message);
+
+    const li = document.createElement('li');
+    if (k % 2 === 0) {
+        li.classList.add("even-message");
+    }
+
+    li.innerHTML = `${messageInfo.userName}-${messageInfo.message}`;
+
+    const br = document.createElement('br');
+    li.appendChild(br);
+    messageList.appendChild(li);
+    k++;
+});
+
+// function for adding participant
 async function addParticipant(e) {
     try {
         e.preventDefault();
@@ -257,7 +318,6 @@ async function addParticipant(e) {
                         alert("Only admins can modify groups");
                     }
                     else {
-                        // console.log(selectedGroup);
                         for (let i = 0; i < users.length; i++) {
                             console.log(users[i].value);
                             const data = {
@@ -265,12 +325,12 @@ async function addParticipant(e) {
                                 group: selectedGroup
                             }
                             axios.post("http://localhost:3000/group/addMember", data)
-                                .then(res => {
-                                })
+                                .then()
                                 .catch(err => {
                                     console.log(err);
                                 })
                         }
+                        window.location.reload();
                     }
                 })
                 .catch(err => {
@@ -288,6 +348,8 @@ async function addParticipant(e) {
 }
 
 
+
+// Function for adding group
 async function addGroup(e) {
     try {
         e.preventDefault();
@@ -312,9 +374,12 @@ async function addGroup(e) {
 
 
 
+
+
 // Access to old messages from local storage
 let lastMessageId;
 
+// localStorage.removeItem("oldMessages");
 const oldMessages = JSON.parse(localStorage.getItem("oldMessages"));
 // If no old messages object exists in local storage
 if (!oldMessages) {
@@ -326,9 +391,12 @@ else if (oldMessages.length > 0) {
     lastMessageId = oldMessages[length - 1].messageID;
 }
 
+
+// initial function
 async function init() {
     try {
         messageList.innerHTML = '';
+        // Getting user info
         await axios.get('http://localhost:3000/users/getUser', { headers: { "Authorization": token } }).
             then(response => {
                 userName = response.data.name;
@@ -337,7 +405,7 @@ async function init() {
             .catch(err => {
                 throw new Error(err);
             })
-
+        // Getting groups for the user
         await axios.get("http://localhost:3000/group/getGroups", { headers: { "Authorization": token } })
             .then(response => {
                 const groups = response.data.response;
@@ -352,11 +420,14 @@ async function init() {
                     li.addEventListener("click", async () => {
                         messageList.innerHTML = "";
                         selectedGroup = groups[i].id;
+                        // We are emitting an event for user joining the group
+                        socket.emit("joinGroup", selectedGroup);
                         welcomeMessage.innerHTML = groups[i].name;
 
-                        // backend-call to get the messages
+                        // backend-call to get the messages for a particular group
                         await axios.get(`http://localhost:3000/message/get-message?lastMessageId=${lastMessageId}`, { headers: { "Authorization": token, "groupId": selectedGroup } })
                             .then(response => {
+
                                 messageList.innerHTML = "";
                                 if (lastMessageId === 0) {
                                     const data = response.data.response;
@@ -370,9 +441,13 @@ async function init() {
                                 }
                                 const messages = JSON.parse(localStorage.getItem("oldMessages"));
 
+
                                 messages.forEach(element => {
                                     if (element.groupId === selectedGroup) {
                                         const li = document.createElement('li');
+                                        if (k % 2 === 0) {
+                                            li.classList.add("even-message");
+                                        }
                                         if (element.userName === userName) {
                                             li.classList.add('current-user');
                                             li.innerHTML = `You-${element.content}`;
@@ -383,6 +458,7 @@ async function init() {
                                         const br = document.createElement('br');
                                         li.appendChild(br);
                                         messageList.appendChild(li);
+                                        k++;
                                     }
                                 });
                             })
@@ -424,8 +500,15 @@ async function submitHandler(e) {
             await axios.post('http://localhost:3000/message/add-message', data, { headers: { "Authorization": token, "groupId": selectedGroup } })
                 .then(res => {
                     const message = res.data.response.content;
+                    socket.emit('sendMessageToGroup', { groupName: selectedGroup, userName, message: message });
+
                     // creating a li and adding to to messageList
                     const li = document.createElement('li');
+
+                    if (k % 2 === 0) {
+                        li.classList.add("even-message");
+                    }
+                    k++;
                     li.classList.add('current-user');
                     li.innerHTML = `You-${message}`;
                     messageList.appendChild(li);

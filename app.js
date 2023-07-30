@@ -1,32 +1,75 @@
-const express=require("express");
+const express = require("express");
+const http = require('http');
+const socketIO = require('socket.io');
 
-const app=express();
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: {
+      origin: '*',
+    },
+  });
+  
 
-const bodyParser=require('body-parser');
-app.use(bodyParser.json({extended:false}));
+const bodyParser = require('body-parser');
+app.use(bodyParser.json({ extended: false }));
 
-const cors=require('cors');
+const cors = require('cors');
 // app.use(cors());
-app.use(
-    cors({
-        origin:"http://127.0.0.1:5500",
-        origin:"http://127.0.0.1:5501"
-    })
-)
-const sequelize=require('./util/database');
+// app.use(cors());
+//     {
+    //     origin: "http://127.0.0.1:5500",
+    //     origin: "http://127.0.0.1:5501"
+    // }
+// Allow any request from any origin
+app.use(cors());
 
-const userRoutes=require('./routes/users');
-const messageRoutes=require('./routes/message');
-const groupRoutes=require('./routes/group');
 
-app.use('/users',userRoutes);
-app.use('/message',messageRoutes);
-app.use('/group',groupRoutes);
 
-const User=require('./model/user');
-const Message=require('./model/message');
-const Group=require('./model/group');
-const UserGroup=require('./model/usergroup');
+
+io.on('connection', (socket) => {
+    console.log('A new client connected');
+  
+    socket.on('joinGroup', (groupName) => {
+    //   console.log("Group");
+    //   console.log(groupName);
+      socket.join(groupName); // Join the specified group
+    });
+  
+    // Handle messages from clients
+    socket.on('sendMessageToGroup', ({ groupName, userName,message }) => {
+      
+    //   console.log(groupName,message);
+
+    // Broadcast the message to all clients in the group
+    //   io.to(groupName).emit('message', message); 
+
+    // Broadcast the message to users other than the user that sent the message
+      socket.to(groupName).emit('message', {userName,message});
+    });
+  
+    // Handle disconnections
+    socket.on('disconnect', () => {
+      console.log('A client disconnected');
+    });
+  });
+  
+
+
+const sequelize = require('./util/database');
+
+const userRoutes = require('./routes/users');
+const messageRoutes = require('./routes/message');
+const groupRoutes = require('./routes/group');
+
+app.use('/users', userRoutes);
+app.use('/message', messageRoutes);
+app.use('/group', groupRoutes);
+
+const User = require('./model/user');
+const Message = require('./model/message');
+const Group = require('./model/group');
+const UserGroup = require('./model/usergroup');
 
 // Relationship between user and messages
 User.hasMany(Message);
@@ -41,10 +84,22 @@ User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
 // sequelize.sync({force:true})
-sequelize.sync()
-    .then(result=>{
-        app.listen(3000);
+// sequelize.sync()
+//     .then(result=>{
+//         app.listen(3000);
+//     })
+//     .catch(err=>{
+//         console.log(err);
+//     })
+
+sequelize
+    .sync()
+    .then((result) => {
+        const port = 3000;
+        server.listen(port, () => {
+            console.log(`Server running on port ${port}`);
+        });
     })
-    .catch(err=>{
+    .catch((err) => {
         console.log(err);
-    })
+    });

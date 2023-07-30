@@ -22,16 +22,17 @@
     </div>
     <div id="right">
         <div class="message-container">
-            <div id="navbar-right">
-                <a id="logout-button" class="myButton" href="login.html">Logout</a>
-            </div>
             <div id="navbar">
-                <button class="show-modal-add" id="add-participant">Add Participant</button>
-                <h1 id="welcome-message"></h1>
-                <button class="show-modal-members" id="group-members" class="centered-button">Group Members</button>
+                <div id="navbar-left">
+                    <button class="show-modal-add" id="add-participant">Add Participant</button>
+                    <h1 id="welcome-message"></h1>
+                    <button class="show-modal-members" id="group-members" class="centered-button">Group Members</button>
+                </div>
+                <div id="navbar-right">
+                    <a id="logout-button" class="myButton" href="login.html">Logout</a>
+                </div>
             </div>
             <ul id="messages"></ul>
-            <!-- <div id="messages"></div> -->
         </div>
         <div class="writing-container">
             <form id="message-form" method="POST" onsubmit="submitHandler(event)">
@@ -72,6 +73,7 @@
     <div class="overlay-members hidden"></div>
 </body>
 <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 <script src="chat-screen.js"></script>
 
 </html>

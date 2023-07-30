@@ -7,7 +7,6 @@ exports.addGroup = async (req, res, next) => {
         const t = await sequelize.transaction();
         const name = req.body.name;
         const userId = req.user.id;
-        console.log(name);
         
         Group.create({ name: name, createdBy: req.user.id, createdAt: new Date() }, { transaction: t })
             .then(response => {
@@ -23,7 +22,6 @@ exports.addGroup = async (req, res, next) => {
             .catch(err => {
                 console.log(err);
             })
-        // console.log(req);
     } catch (err) {
         throw new Error(err);
     }
@@ -32,16 +30,13 @@ exports.addGroup = async (req, res, next) => {
 exports.getGroups=async (req,res,next)=>{
     try{
         const userId=req.user.id;
-        console.log(userId);
         await UserGroup.findAll({where:{userId:userId}})
             .then(async(response)=>{
-                // console.log(response.dataValues);
                 let groups=[];
                 for(let i=0;i<response.length;i++){
                     const groupId=response[i].dataValues.groupId;
                     await Group.findAll({where:{id:groupId}})
                         .then(groupInfo=>{
-                            // console.log(groupInfo[0].dataValues);
                             groups.push(groupInfo[0].dataValues)
                         })
                         .catch(err=>{
@@ -62,7 +57,6 @@ exports.addMember=async(req,res,next)=>{
     try{
         const userId=req.body.user;
         const groupId=req.body.group;
-        console.log(userId,groupId);
 
         UserGroup.create({userId:userId ,groupId:groupId ,isAdmin:false})
             .then(response=>{
@@ -81,7 +75,7 @@ exports.removeMember=async(req,res,next)=>{
     try{
         const userId=req.body.userId;
         const groupId=req.body.groupId;
-        // console.log(userId,groupId);
+
         UserGroup.findAll({where:{userId:userId,groupId:groupId}})
             .then(usergroup=>{
                 usergroup[0].destroy();
@@ -102,7 +96,6 @@ exports.isAdmin=(req,res,next)=>{
         
         UserGroup.findAll({where:{groupId:groupId,userId:userId}})
             .then(response=>{
-                // console.log(response[0].dataValues);
                 const dataValues=response[0].dataValues;
                 if(dataValues.isAdmin){
                     res.status(201).json({"isAdmin":true});
@@ -120,7 +113,6 @@ exports.isAdmin=(req,res,next)=>{
 
 exports.getUsers=(req,res,next)=>{
     try{
-        // console.log(req.user.id);
         const groupId=req.header("groupId");
         const userId=req.user.id;
         UserGroup.findAll({where:{groupId:groupId}})
@@ -143,7 +135,7 @@ exports.makeAdmin=async(req,res,next)=>{
     try{
         const userId=req.body.userId;
         const groupId=req.body.groupId;
-        console.log(userId,groupId);
+        
         UserGroup.findAll({where:{userId:userId,groupId:groupId}})
             .then(usergroup=>{
                 usergroup[0].isAdmin=true;
