@@ -267,6 +267,10 @@ body {
 
 }
 
+#right{
+  grid-template-rows:auto auto;
+}
+
 .container {
     display: flex;
     align-items: right;
@@ -304,7 +308,14 @@ hr{
 }
 .message-container {
     background-color: whitesmoke;
-    height: 90vh;
+}
+
+.writing-container {
+  padding:50px;
+  background-color: #804674;
+  height: 10vh;
+  display: grid;
+  grid-template-columns:1fr 1fr;
 }
 
 
@@ -328,9 +339,11 @@ hr{
     color: black;
 }
 
-.writing-container {
-    background-color: #804674;
-    height: 10vh;
+
+
+#multi-input{
+  position: relative;
+  margin:auto;
 }
 
 #welcome-message {
@@ -355,7 +368,6 @@ hr{
 #message-form {
     position: relative;
     margin: auto;
-    text-align: center;
 }
 
 #input-box {

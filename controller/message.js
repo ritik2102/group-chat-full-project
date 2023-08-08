@@ -1,46 +1,50 @@
-const Message=require('../model/message');
-const Sequelize=require("sequelize");
+const Message = require('../model/message');
+const Sequelize = require("sequelize");
 
-exports.postMessage=(req,res,next)=>{
-    const groupId=req.header("groupId");
-    const userId=req.user.id;
 
-    const message=req.body.message;
+exports.postMessage = (req, res, next) => {
+    const groupId = req.header("groupId");
+    const userId = req.user.id;
 
-    Message.create({userId:userId,groupId:groupId,userName:req.user.name,content:message,timestamp: new Date()})
-        .then(response=>{
-            res.status(201).json({"response":response.dataValues});
+    const message = req.body.message;
+
+    Message.create({ userId: userId, groupId: groupId, userName: req.user.name, content: message,type:"text", timestamp: new Date() })
+        .then(response => {
+            res.status(201).json({ "response": response.dataValues });
         })
-        .catch(err=>{
+        .catch(err => {
             throw new Error(err);
         })
 }
 
 
-exports.getMessage=(req,res,next)=>{
-    const lastMessageId=+req.query.lastMessageId;
-    const groupId=+req.header("groupId");
-    if(lastMessageId){
+exports.getMessage = (req, res, next) => {
+    const lastMessageId = +req.query.lastMessageId;
+    const groupId = +req.header("groupId");
+    if (lastMessageId) {
         Message.findAll(
-            {where:
-                 {messageID: {[Sequelize.Op.gt]: lastMessageId},
-                 groupId:groupId}
+            {
+                where:
+                {
+                    messageID: { [Sequelize.Op.gt]: lastMessageId },
+                    groupId: groupId
+                }
             })
-            .then(messages=>{
-                res.status(201).json({"response":messages});
+            .then(messages => {
+                res.status(201).json({ "response": messages });
             })
-            .catch(err=>{
+            .catch(err => {
                 throw new Error(err);
             })
-    } else{
+    } else {
         Message.findAll(
-            {where:{groupId:groupId}})
-            .then(messages=>{
-                res.status(201).json({"response":messages});
+            { where: { groupId: groupId } })
+            .then(messages => {
+                res.status(201).json({ "response": messages });
             })
-            .catch(err=>{
+            .catch(err => {
                 throw new Error(err);
             })
     }
-    
+
 }

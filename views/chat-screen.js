@@ -443,23 +443,24 @@ async function init() {
 
 
                                 messages.forEach(element => {
-                                    if (element.groupId === selectedGroup) {
+
+                                    console.log(element.type);
+                                    if (element.type === "text") {
+                                        createTextElement(element);
+
+                                    } else {
+                                        const mediaElement = createMediaElement(element.content, element.type);
+
                                         const li = document.createElement('li');
+                                        li.classList.add('current-user');
                                         if (k % 2 === 0) {
                                             li.classList.add("even-message");
                                         }
-                                        if (element.userName === userName) {
-                                            li.classList.add('current-user');
-                                            li.innerHTML = `You-${element.content}`;
-                                        } else {
-                                            li.classList.add('other-user');
-                                            li.innerHTML = `${element.userName.split(" ")[0]}-${element.content}`;
-                                        }
-                                        const br = document.createElement('br');
-                                        li.appendChild(br);
-                                        messageList.appendChild(li);
                                         k++;
+                                        li.appendChild(mediaElement);
+                                        messageList.appendChild(li);
                                     }
+
                                 });
                             })
                             .catch(err => {
@@ -483,6 +484,27 @@ async function init() {
 }
 
 init();
+
+function createTextElement(element) {
+
+    if (element.groupId === selectedGroup) {
+        const li = document.createElement('li');
+        if (k % 2 === 0) {
+            li.classList.add("even-message");
+        }
+        if (element.userName === userName) {
+            li.classList.add('current-user');
+            li.innerHTML = `You-${element.content}`;
+        } else {
+            li.classList.add('other-user');
+            li.innerHTML = `${element.userName.split(" ")[0]}-${element.content}`;
+        }
+        const br = document.createElement('br');
+        li.appendChild(br);
+        messageList.appendChild(li);
+        k++;
+    }
+}
 
 // setInterval(()=>init(),1000);
 
@@ -525,3 +547,186 @@ async function submitHandler(e) {
 
 
 }
+
+// Handling multimedia chats
+
+
+function createMediaElement(url, type) {
+    let mediaElement;
+
+    if (type.startsWith('image')) {
+        mediaElement = document.createElement('img');
+        mediaElement.src = url;
+    } else if (type.startsWith('audio')) {
+        mediaElement = document.createElement('audio');
+        mediaElement.controls = true;
+        mediaElement.src = url;
+    } else if (type.startsWith('video')) {
+        mediaElement = document.createElement('video');
+        mediaElement.controls = true;
+        mediaElement.src = url;
+    } else {
+        // Unsupported media type
+        mediaElement = document.createElement('p');
+        mediaElement.textContent = 'Unsupported file type';
+    }
+
+    return mediaElement;
+}
+
+function uploadFiles() {
+    const uploadForm = document.getElementById('uploadForm');
+    const formData = new FormData();
+
+    // Get the file input elements
+    const fileInput = document.getElementById('fileInput');
+
+    // Append the files to the formData
+    formData.append('media', fileInput.files[0]);
+
+
+    // You can now send the formData to the server using fetch or XMLHttpRequest.
+    // Replace 'your_upload_url' with the URL where you want to handle the file upload on the server-side.
+
+    axios.post("http://localhost:3000/message/upload", formData, { headers: { "Authorization": token, "groupId": selectedGroup } })
+        .then(response => {
+            // Handle the server response here if needed
+            const userName = response.data.userName;
+            const content = response.data.content;
+            const type = response.data.type;
+
+            console.log(userName, content, type);
+            const mediaElement = createMediaElement(content, type);
+
+            const li = document.createElement('li');
+            li.classList.add('current-user');
+            li.appendChild(mediaElement);
+            messageList.appendChild(`You-${li}`);
+            // document.getElementById('status').innerText = 'Files uploaded successfully!';
+        })
+        .catch(error => {
+            // Handle any errors that occurred during the upload process
+            // document.getElementById('status').innerText = 'Error uploading files.';
+            console.error('Error:', error);
+        });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Get references to HTML elements
+// const fileInput = document.getElementById('fileInput');
+
+// // Add an event listener to the file input field
+// fileInput.addEventListener('change', handleMediaSelection);
+
+// // Function to handle media selection
+// function handleMediaSelection(event) {
+
+//     // Frontend (JavaScript using Axios)
+//     const file = fileInput.files[0];
+
+//     if (!file) {
+//         alert('Please select a file before uploading.');
+//         return;
+//     }
+
+//     const reader = new FileReader();
+
+//     // Convert the File object to a Buffer
+//     reader.onload = function () {
+//         const fileBuffer = reader.result;
+//         sendFileToBackend(fileBuffer);
+//     };
+
+//     reader.readAsArrayBuffer(file);
+// }
+
+// // Function to create HTML elements for displaying media
+// function createMediaElement(url, type) {
+//     let mediaElement;
+
+//     if (type.startsWith('image')) {
+//         mediaElement = document.createElement('img');
+//         mediaElement.src = url;
+//     } else if (type.startsWith('audio')) {
+//         mediaElement = document.createElement('audio');
+//         mediaElement.controls = true;
+//         mediaElement.src = url;
+//     } else if (type.startsWith('video')) {
+//         mediaElement = document.createElement('video');
+//         mediaElement.controls = true;
+//         mediaElement.src = url;
+//     } else {
+//         // Unsupported media type
+//         mediaElement = document.createElement('p');
+//         mediaElement.textContent = 'Unsupported file type';
+//     }
+
+//     return mediaElement;
+// }
+
+
+// function sendFileToBackend(fileBuffer) {
+//     // console.log(formData);
+//     const fileName = fileInput.files[0].name;
+//     const fileType = fileInput.files[0].type;
+
+//     // Create a new FormData object and append the fileBuffer
+//     const formData = new FormData();
+//     formData.append('file', new Blob([fileBuffer]), fileName);
+
+//     const data={
+//         formData,
+//         fileName:fileName,
+//         fileType:fileType
+//     }
+//     axios.post('http://localhost:3000/message/addMultimedia', data, { headers: { "Authorization": token, "groupId": selectedGroup } })
+//         .then(response => {
+//             // Handle the response from the backend (if needed)
+//             const url = response.data.fileUrl;
+//             let mediaElement;
+//             mediaElement = document.createElement('img');
+//             mediaElement.src = url;
+
+//             const li = document.createElement('li');
+//             li.classList.add('current-user');
+//             li.appendChild(mediaElement);
+//             messageList.appendChild(li);
+
+
+//         })
+//         .catch(error => {
+//             // Handle any errors that occur during the POST request
+//             console.error('Error sending data to backend:', error);
+//         });
+//     // Replace 'your-backend-endpoint' with the actual URL of your backend endpoint that handles file uploads
+// }

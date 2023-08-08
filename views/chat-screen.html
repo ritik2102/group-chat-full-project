@@ -33,8 +33,16 @@
                 </div>
             </div>
             <ul id="messages"></ul>
+            <div id="mediaPreview"></div>
         </div>
         <div class="writing-container">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="fileInput" accept="image/*, audio/*, video/*" />
+                <br>
+                <!-- Rest of the form fields for video and audio -->
+                <br>
+                <button type="button" onclick="uploadFiles()">Upload</button>
+            </form>
             <form id="message-form" method="POST" onsubmit="submitHandler(event)">
                 <input id="input-box" type="text" required>
                 <button id="message-button" type="submit">Send</button>
