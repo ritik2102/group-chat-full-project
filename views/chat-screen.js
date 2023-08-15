@@ -9,15 +9,6 @@ let userName;
 let selectedGroup;
 
 
-
-
-
-
-
-
-
-
-
 //Modal window functionality for adding group
 // 'use strict';
 
@@ -441,10 +432,10 @@ async function init() {
                                 }
                                 const messages = JSON.parse(localStorage.getItem("oldMessages"));
 
-
                                 messages.forEach(element => {
-
-                                    console.log(element.type);
+                                    if (element.groupId !== selectedGroup) {
+                                        return;
+                                    }
                                     if (element.type === "text") {
                                         createTextElement(element);
 
@@ -457,6 +448,14 @@ async function init() {
                                             li.classList.add("even-message");
                                         }
                                         k++;
+                                        // We are adding a tag for user who sent the image before adding the image to li
+
+                                        if (element.userName === userName) {
+                                            li.appendChild(document.createTextNode('You-'));
+                                        } else {
+                                            li.appendChild(document.createTextNode(`${element.userName.split(" ")[0]}-`));
+                                        }
+                                        li.appendChild(document.createElement('br'));
                                         li.appendChild(mediaElement);
                                         messageList.appendChild(li);
                                     }
@@ -466,8 +465,6 @@ async function init() {
                             .catch(err => {
                                 throw new Error(err);
                             })
-
-
                     })
                     const hr = document.createElement("hr");
                     groupsContainer.appendChild(li);
@@ -600,8 +597,11 @@ function uploadFiles() {
 
             const li = document.createElement('li');
             li.classList.add('current-user');
+
+            li.appendChild(document.createTextNode('You-'));
+            li.appendChild(document.createElement('br'));
             li.appendChild(mediaElement);
-            messageList.appendChild(`You-${li}`);
+            messageList.appendChild(li);
             // document.getElementById('status').innerText = 'Files uploaded successfully!';
         })
         .catch(error => {
@@ -612,121 +612,3 @@ function uploadFiles() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Get references to HTML elements
-// const fileInput = document.getElementById('fileInput');
-
-// // Add an event listener to the file input field
-// fileInput.addEventListener('change', handleMediaSelection);
-
-// // Function to handle media selection
-// function handleMediaSelection(event) {
-
-//     // Frontend (JavaScript using Axios)
-//     const file = fileInput.files[0];
-
-//     if (!file) {
-//         alert('Please select a file before uploading.');
-//         return;
-//     }
-
-//     const reader = new FileReader();
-
-//     // Convert the File object to a Buffer
-//     reader.onload = function () {
-//         const fileBuffer = reader.result;
-//         sendFileToBackend(fileBuffer);
-//     };
-
-//     reader.readAsArrayBuffer(file);
-// }
-
-// // Function to create HTML elements for displaying media
-// function createMediaElement(url, type) {
-//     let mediaElement;
-
-//     if (type.startsWith('image')) {
-//         mediaElement = document.createElement('img');
-//         mediaElement.src = url;
-//     } else if (type.startsWith('audio')) {
-//         mediaElement = document.createElement('audio');
-//         mediaElement.controls = true;
-//         mediaElement.src = url;
-//     } else if (type.startsWith('video')) {
-//         mediaElement = document.createElement('video');
-//         mediaElement.controls = true;
-//         mediaElement.src = url;
-//     } else {
-//         // Unsupported media type
-//         mediaElement = document.createElement('p');
-//         mediaElement.textContent = 'Unsupported file type';
-//     }
-
-//     return mediaElement;
-// }
-
-
-// function sendFileToBackend(fileBuffer) {
-//     // console.log(formData);
-//     const fileName = fileInput.files[0].name;
-//     const fileType = fileInput.files[0].type;
-
-//     // Create a new FormData object and append the fileBuffer
-//     const formData = new FormData();
-//     formData.append('file', new Blob([fileBuffer]), fileName);
-
-//     const data={
-//         formData,
-//         fileName:fileName,
-//         fileType:fileType
-//     }
-//     axios.post('http://localhost:3000/message/addMultimedia', data, { headers: { "Authorization": token, "groupId": selectedGroup } })
-//         .then(response => {
-//             // Handle the response from the backend (if needed)
-//             const url = response.data.fileUrl;
-//             let mediaElement;
-//             mediaElement = document.createElement('img');
-//             mediaElement.src = url;
-
-//             const li = document.createElement('li');
-//             li.classList.add('current-user');
-//             li.appendChild(mediaElement);
-//             messageList.appendChild(li);
-
-
-//         })
-//         .catch(error => {
-//             // Handle any errors that occur during the POST request
-//             console.error('Error sending data to backend:', error);
-//         });
-//     // Replace 'your-backend-endpoint' with the actual URL of your backend endpoint that handles file uploads
-// }

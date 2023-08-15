@@ -64,6 +64,7 @@ const User = require('./model/user');
 const Message = require('./model/message');
 const Group = require('./model/group');
 const UserGroup = require('./model/usergroup');
+const Archived=require('./model/archived');
 
 // Relationship between user and messages
 User.hasMany(Message);
@@ -77,6 +78,25 @@ Message.belongsTo(Group);
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
+var CronJob = require('cron').CronJob;
+var job = new CronJob(
+    '0 0 0 * * *',
+    async function() {
+      const messagesToMove = await Message.findAll(); // Retrieve all messages from the Message table
+
+      // Create a transaction to ensure data integrity
+      await sequelize.transaction(async (t) => {
+      // Insert each message into the Archived table
+      await Archived.bulkCreate(messagesToMove, { transaction: t });
+      // Delete all messages from the Message table
+      await Message.destroy({ where: {}, truncate: true, transaction: t });
+      });
+  
+    },
+    null,
+    true,
+    'America/Los_Angeles'
+);
 
 // sequelize.sync({force:true})
 sequelize.sync()
